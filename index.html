@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Braslove</title>
+<meta name="description" content="Braslove: contratos, cobranças e repasses da Braslive.">
+<link rel="icon" href="img/braslove.ico">
+<link rel="stylesheet" href="style.css">
+<meta name="robots" content="noindex">
+</head>
+<body>
+<header class="topo">
+  <a class="marca" href="./"><img src="img/logo_app_192.png" alt=""><b>Braslove</b></a>
+  <nav id="menu" class="hidden">
+    <button data-pag="conta">Minha conta</button>
+    <button data-pag="baixar">Baixar o programa</button>
+    <button data-pag="admin" class="so-admin hidden">Usuários</button>
+    <button id="btnSair">Sair</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ENTRADA -->
+  <section id="pag-entrada" class="pag entrada hidden">
+    <div class="hero">
+      <img src="img/logo_mark_white.png" alt="">
+      <h1>Contratos, cobranças e repasses no mesmo ritmo.</h1>
+      <p>O Braslove lê e-mails, contratos e o Aboss, confere tudo campo a campo e só então registra no ClickUp. Também cuida das cobranças por e-mail.</p>
+      <ul>
+        <li>Crie a sua conta com o e-mail da empresa.</li>
+        <li>Baixe e instale o programa no seu computador.</li>
+        <li>A administradora libera as funções que você vai usar.</li>
+      </ul>
+    </div>
+    <div class="cartao" id="cartaoAuth"></div>
+  </section>
+
+  <!-- MINHA CONTA -->
+  <section id="pag-conta" class="pag hidden">
+    <div id="situacao"></div>
+    <div class="grade">
+      <div class="cartao">
+        <h2>Meus dados</h2>
+        <label>E-mail<input id="mc_email" disabled></label>
+        <label>Nome completo<input id="mc_nome"></label>
+        <div class="dois"><label>Cargo<input id="mc_cargo"></label><label>Telefone<input id="mc_tel"></label></div>
+        <button class="btn" id="mcSalvar">Salvar</button>
+      </div>
+      <div class="cartao">
+        <h2>Trocar senha</h2>
+        <label>Nova senha<input type="password" id="mc_nova" autocomplete="new-password"></label>
+        <label>Repita a nova senha<input type="password" id="mc_nova2" autocomplete="new-password"></label>
+        <p class="mut">Mínimo de 8 caracteres, com letras e números.</p>
+        <button class="btn" id="mcSenha">Trocar senha</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAIXAR -->
+  <section id="pag-baixar" class="pag hidden">
+    <div class="cartao largo" id="baixarBox"></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="pag-admin" class="pag hidden">
+    <div class="cartao largo">
+      <div class="cab"><h2>Usuários do Braslove</h2>
+        <div class="seg" id="filtroAdm"><button data-f="pendente" class="on">Aguardando aprovação <span id="nPend"></span></button><button data-f="todos">Todos</button><button data-f="bloqueado">Bloqueados</button></div></div>
+      <div id="tabAdm"></div>
+    </div>
+    <div class="cartao largo"><h2>Últimas alterações</h2><div id="eventosAdm"></div></div>
+  </section>
+</main>
+
+<div id="modal"></div>
+<div id="aviso" class="aviso hidden"></div>
+<footer>© Braslove · Braslive Entretenimento</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
