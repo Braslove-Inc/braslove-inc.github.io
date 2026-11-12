@@ -175,11 +175,43 @@ async function renderBaixar(){
       <li>No fim, o instalador baixa o navegador usado para ler o Aboss (precisa de internet).</li>
       <li>Abra o Braslove e entre com o mesmo e-mail e senha deste site.</li></ol>
     ${v.notas ? `<p class="mut">${esc(v.notas)}</p>` : ''}`;
-  $('#bxOk').onclick = async () => {
-    const {data: url, error: e2} = await sb.storage.from('instaladores').createSignedUrl(v.arquivo, 300, {download: 'Braslove_Setup.exe'});
-    if(e2) return aviso(traduz(e2), 'err');
-    location.href = url.signedUrl;
-  };
+  $('#bxOk').onclick = () => baixarInstalador(v);
+}
+async function baixarInstalador(v){
+  // O instalador fica no Supabase em partes de até 45 MB (limite do plano grátis): o site baixa as partes
+  // e junta tudo de volta num único Braslove_Setup.exe, sem sair desta página.
+  const btn = $('#bxOk'); btn.disabled = true;
+  try{
+    const {data: lista, error: el} = await sb.storage.from('instaladores').list('', {search: v.arquivo, limit: 100});
+    if(el) throw el;
+    let partes = (lista || []).map(o => o.name).filter(n => n.startsWith(v.arquivo + '.parte')).sort();
+    if(!partes.length){  // instalador num arquivo só
+      const {data: url, error} = await sb.storage.from('instaladores').createSignedUrl(v.arquivo, 300, {download: 'Braslove_Setup.exe'});
+      if(error) throw error;
+      location.href = url.signedUrl; return;
+    }
+    const blobs = []; let baixado = 0;
+    for(const nome of partes){
+      const {data: url, error} = await sb.storage.from('instaladores').createSignedUrl(nome, 300);
+      if(error) throw error;
+      const r = await fetch(url.signedUrl);
+      if(!r.ok) throw new Error(`Falha no download (erro ${r.status}). Tente de novo.`);
+      const leitor = r.body.getReader(), pedacos = [];
+      for(;;){
+        const {done, value} = await leitor.read();
+        if(done) break;
+        pedacos.push(value); baixado += value.length;
+        btn.textContent = `Baixando… ${Math.min(99, Math.round(baixado / (v.tamanho || baixado) * 100))}%`;
+      }
+      blobs.push(new Blob(pedacos));
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(blobs, {type: 'application/octet-stream'}));
+    a.download = 'Braslove_Setup.exe'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 120000);
+    btn.textContent = 'Baixado ✓';
+  }catch(e){ aviso(traduz(e), 'err'); btn.textContent = 'Baixar o instalador'; }
+  finally{ btn.disabled = false; }
 }
 
 // ------------------------------------------------------------------ painel de usuários (admin)
